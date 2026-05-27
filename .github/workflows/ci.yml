@@ -1,0 +1,18 @@
+name: CI
+"on":
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pydantic numpy pytest
+      - run: python -c "from schemas.common import SentimentResult, EntityList, MeetingNotes; s=SentimentResult(label='positive',score=0.9,reasoning='good',key_phrases=[]); assert s.label=='positive'; print('schemas OK')"
+      - run: python -c "from schemas.common import ProductReview; r=ProductReview(product_name='Test',overall_rating=4.5,would_recommend=True,summary='Great'); assert r.overall_rating==4.5; print('product review OK')"
+      - run: python extract.py
